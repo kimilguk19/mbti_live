@@ -27,6 +27,50 @@ class MbtiLiveScreen extends StatefulWidget {
   State<MbtiLiveScreen> createState() => _MbtiLiveScreenState();
 }
 class _MbtiLiveScreenState extends State<MbtiLiveScreen> {
+  // MBTI 초기 값 지정(16개)
+  List<String> mbtiTypes = [
+    'ISTJ', 'ISFJ', 'INFJ', 'INTJ',
+    'ISTP', 'ISFP', 'INFP', 'INTP',
+    'ESTP', 'ESFP', 'ENFP', 'ENTP',
+    'ESTJ', 'ESFJ', 'ENFJ', 'ENTJ'
+  ];
+// MBTI 유형에 매칭되는 16개의 색상
+  List<Color> mbtiColors = [
+    Colors.red,     //ISTJ-
+    Colors.orange,  //ISFJ
+    Colors.yellow,  //INFJ
+    Colors.green,   //INTJ-
+    Colors.blue,    //ISTP-
+    Colors.indigo,  //ISFP
+    Colors.purple,  //INFP
+    Colors.pink,    //INTP-
+    Colors.teal,    //ESTP-
+    Colors.cyan,    //ESFP
+    Colors.lime,    //ENFP
+    Colors.amber,   //ENTP-
+    Colors.brown,   //ESTJ-
+    Colors.grey,    //ESFJ
+    Colors.blueGrey,//ENFJ
+    Colors.deepPurple//ENTJ-
+  ];
+  Map<String, Map<String, List<String>>> mbtiMatches = {
+    'ISTJ': {'best': ['ISTJ', 'ISFJ'], 'good': ['ISTJ', 'INFJ'], 'bed': ['ISTJ', 'INTJ']},
+    'ISFJ': {'best': ['ISFJ', 'ISTJ'], 'good': ['ISFJ', 'INFP'], 'bed': ['ISFJ', 'INTP']},
+    'INFJ': {'best': ['INFJ', 'ISTJ'], 'good': ['INFJ', 'ISFP'], 'bed': ['INFJ', 'INTJ']},
+    'INTJ': {'best': ['INTJ', 'ISTJ'], 'good': ['INTJ', 'INFP'], 'bed': ['INTJ', 'ISFP']},
+    'ISTP': {'best': ['ISTP', 'ISFP'], 'good': ['ISTP', 'INFP'], 'bed': ['ISTP', 'INTP']},
+    'ISFP': {'best': ['ISFP', 'ISTP'], 'good': ['ISFP', 'INFP'], 'bed': ['ISFP', 'INTJ']},
+    'INFP': {'best': ['INFP', 'ISTP'], 'good': ['INFP', 'ISFP'], 'bed': ['INFP', 'INTP']},
+    'INTP': {'best': ['INTP', 'ISTP'], 'good': ['INTP', 'ISFP'], 'bed': ['INTP', 'INFJ']},
+    'ESTP': {'best': ['ESTP', 'ESFP'], 'good': ['ESTP', 'ENFP'], 'bed': ['ESTP', 'ENTP']},
+    'ESFP': {'best': ['ESFP', 'ESTP'], 'good': ['ESFP', 'ENFP'], 'bed': ['ESFP', 'ENTJ']},
+    'ENFP': {'best': ['ENFP', 'ESTP'], 'good': ['ENFP', 'ESFP'], 'bed': ['ENFP', 'ENTJ']},
+    'ENTP': {'best': ['ENTP', 'ESTP'], 'good': ['ENTP', 'ESFP'], 'bed': ['ENTP', 'ENFJ']},
+    'ESTJ': {'best': ['ESTJ', 'ESFJ'], 'good': ['ESTJ', 'ENFJ'], 'bed': ['ESTJ', 'ENTJ']},
+    'ESFJ': {'best': ['ESFJ', 'ESTJ'], 'good': ['ESFJ', 'ENFP'], 'bed': ['ESFJ', 'ENTJ']},
+    'ENFJ': {'best': ['ENFJ', 'ESTJ'], 'good': ['ENFJ', 'ESFP'], 'bed': ['ENFJ', 'ENTP']},
+    'ENTJ': {'best': ['ENTJ', 'ESTJ'], 'good': ['ENTJ', 'ESFP'], 'bed': ['ENTJ', 'ENFP']}
+  };
   @override
   Widget build(BuildContext context) {
     //return const Placeholder();
