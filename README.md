@@ -1,6 +1,6 @@
 # mbti_live
 
-MBTI 앱 프로젝트(6주차 3교시 강의 소스)
+MBTI 앱 프로젝트(7주차 1교시 강의 소스)
 
 ## Getting Started
 

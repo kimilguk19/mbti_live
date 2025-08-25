@@ -30,6 +30,9 @@ class MbtiLiveScreen extends StatefulWidget {
 }
 
 class _MbtiLiveScreenState extends State<MbtiLiveScreen> {
+  // 선택된 상태를 지정할 초기값 없는 private 변수
+  String? _selectedMbtiType1;
+  String? _selectedMbtiType2;
   // MBTI 초기 값 지정(16개)
   List<String> mbtiTypes = [
     'ISTJ',
@@ -197,7 +200,41 @@ class _MbtiLiveScreenState extends State<MbtiLiveScreen> {
                 itemCount: mbtiTypes.length, //출력할 전체개수
                 itemBuilder: (BuildContext context, int index) {
                   return GestureDetector(
-                    onTap: () {}, // 액션 처리 예정
+                    onTap: () {
+                      print('MBTI Type: ${mbtiTypes[index]}');
+                      // 2개의 MbtiType을 선택했을 경우 _selectedMbtiType1,2 값 저장(아래)
+                      if (_selectedMbtiType1 == null) {
+                        setState(() { // setState를 사용하여 UI를 업데이트
+                          _selectedMbtiType1 = mbtiTypes[index];
+                        });
+                      } else if (_selectedMbtiType2 == null) {
+                        setState(() {
+                          _selectedMbtiType2 = mbtiTypes[index];
+                        });
+                      }
+                      // 2개의 MbtiType을 선택했을 경우 showDialog 창을 띄운다.(아래)
+                      if (_selectedMbtiType1 != null && _selectedMbtiType2 != null) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('MBTI 매칭 결과'),
+                              content: Text(
+                                'MBTI Type1: ${_selectedMbtiType1}\nMBTI Type2: ${_selectedMbtiType2}',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('확인'),
+                                ),
+                              ],
+                            );
+                          } // builder
+                        ); // showDialog
+                      }
+                    }, // 액션 처리 예정
                     child: Card(
                       elevation: 4.0, // 그림자 효과
                       shape: RoundedRectangleBorder(
