@@ -199,17 +199,27 @@ class _MbtiLiveScreenState extends State<MbtiLiveScreen> {
                 ),
                 itemCount: mbtiTypes.length, //출력할 전체개수
                 itemBuilder: (BuildContext context, int index) {
+                  // 선택된 MBTI 타입과 Card 16개 중 MBTI 타입이 일치하는지 확인된 것만 줄이기 위해 변수 추가(아래)
+                  bool isSelected = _selectedMbtiType1 == mbtiTypes[index] || _selectedMbtiType2 == mbtiTypes[index];
                   return GestureDetector(
                     onTap: () {
-                      print('MBTI Type: ${mbtiTypes[index]}');
+                      print('MBTI Type: ${mbtiTypes[index]}'); // 디버그용 콘솔출력
                       // 2개의 MbtiType을 선택했을 경우 _selectedMbtiType1,2 값 저장(아래)
                       if (_selectedMbtiType1 == null) {
                         setState(() { // setState를 사용하여 UI를 업데이트
                           _selectedMbtiType1 = mbtiTypes[index];
                         });
+                      } else if (_selectedMbtiType1 == mbtiTypes[index]) {
+                        setState(() {
+                          _selectedMbtiType1 = null;
+                        });
                       } else if (_selectedMbtiType2 == null) {
                         setState(() {
                           _selectedMbtiType2 = mbtiTypes[index];
+                        });
+                      } else if (_selectedMbtiType2 == mbtiTypes[index]) {
+                        setState(() {
+                          _selectedMbtiType2 = null;
                         });
                       }
                       // 2개의 MbtiType을 선택했을 경우 showDialog 창을 띄운다.(아래)
@@ -217,15 +227,30 @@ class _MbtiLiveScreenState extends State<MbtiLiveScreen> {
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
+                            // !기호를 사용하여 빈값이 아니라고 강제로 표시(아래 배열 값)
+                            Map<String, List<String>> mbitMatches = mbtiMatches[_selectedMbtiType1]!;
+                            String relationship = '평범한 편'; // 매칭 결과 기본값 지정
+                            if(mbitMatches['best']!.contains(_selectedMbtiType2)){
+                              relationship = '매우 잘 맞는 편';
+                            }else if(mbitMatches['good']!.contains(_selectedMbtiType2)){
+                              relationship = '잘 맞는 편';
+                            }else if(mbitMatches['bed']!.contains(_selectedMbtiType2)){
+                              relationship = '잘 맞지 않는 편';
+                            }
                             return AlertDialog(
                               title: Text('MBTI 매칭 결과'),
                               content: Text(
-                                'MBTI Type1: ${_selectedMbtiType1}\nMBTI Type2: ${_selectedMbtiType2}',
+                                '${_selectedMbtiType1} 과 ${_selectedMbtiType2} 의 궁합은 $relationship 입니다.',
                               ),
                               actions: [
                                 TextButton(
                                   onPressed: () {
                                     Navigator.of(context).pop();
+                                    //화면상태 변화를 주려고 setStat()로 감싸줌, 팝업 창을 닫을 때 선택한 값 초기화
+                                    setState(() {
+                                      _selectedMbtiType1 = null;
+                                      _selectedMbtiType2 = null;
+                                    });
                                   },
                                   child: Text('확인'),
                                 ),
@@ -233,37 +258,47 @@ class _MbtiLiveScreenState extends State<MbtiLiveScreen> {
                             );
                           } // builder
                         ); // showDialog
-                      }
+                      } // end if
                     }, // 액션 처리 예정
-                    child: Card(
-                      elevation: 4.0, // 그림자 효과
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0), // 모서리 둥글게
-                      ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: mbtiColors[index],
-                          borderRadius: BorderRadius.circular(8.0),
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [ //0~255의 색상 값에서 50% 의 투명도 계산(아래)
-                              mbtiColors[index].withAlpha((255 * 0.5).round()),
-                              mbtiColors[index].withOpacity(1.0),//deprecated예정
-                            ],
+                    //TweenAnimationBuilder 위젯으로 일정 가간 동안 움직이는 애니메이션 효과를 부여
+                    child: TweenAnimationBuilder(
+                      tween: Tween<double>(begin: 1.0, end: isSelected?0.85:1.0), //선택된 상태에서만 크기가 줄어든다.
+                      duration: Duration(milliseconds: 300), // 애니메이션 지속 시간
+                      builder: (BuildContext context, double scale, Widget? child) {
+                        return Transform.scale(
+                          scale: scale,
+                          child: Card(
+                          elevation: 4.0, // 그림자 효과
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0), // 모서리 둥글게
                           ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            mbtiTypes[index],
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: mbtiColors[index],
+                              borderRadius: BorderRadius.circular(8.0),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [ //0~255의 색상 값에서 50% 의 투명도 계산(아래)
+                                  mbtiColors[index].withAlpha((255 * 0.5).round()),
+                                  mbtiColors[index].withOpacity(1.0),//deprecated예정
+                                ],
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                mbtiTypes[index],
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
+                        );
+                      }, // builder
                     ),
                   );
                 }, // itemBuilder
